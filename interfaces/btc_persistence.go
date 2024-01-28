@@ -1,6 +1,6 @@
 package interfaces
 
-import "data-engine/entities"
+import "github.com/jpandof/data-engine/entities"
 
 type BTCPersistence interface {
 	FetchTx(tx *entities.Tx) (*entities.Tx, error) // FetchTxLevelDB(tx *entities.Tx) (*entities.Tx, error)

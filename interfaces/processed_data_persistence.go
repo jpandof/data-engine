@@ -1,6 +1,6 @@
 package interfaces
 
-import "data-engine/entities"
+import "github.com/jpandof/data-engine/entities"
 
 type ProcessedDataPersistence interface {
 	AddTransactionPricedByWallets(wallets []*entities.Wallet) error //AddTransactionsByLoteLevelDB(wallets []*entities.Wallet) error

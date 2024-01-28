@@ -1,6 +1,6 @@
 package interfaces
 
-import "data-engine/entities"
+import "github.com/jpandof/data-engine/entities"
 
 type AnalysisPersistence interface {
 	FetchAllIdWallet() ([]string, error) // GetAllWalletIDsLevelDB(id string) ([]string, error)
