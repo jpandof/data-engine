@@ -26,7 +26,7 @@ func NewMongoDBProcessedDataPersistence(uri, dbName string) (*ProcessedDataPersi
 	return &ProcessedDataPersistence{
 		client:                 client,
 		db:                     db,
-		walletsCollection:      db.Collection("wallets"),
+		walletsCollection:      db.Collection("wallets-id"),
 		transactionsCollection: db.Collection("transactions"),
 	}, nil
 }
