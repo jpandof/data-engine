@@ -1,4 +1,4 @@
-module data-engine
+module github.com/jpandof/data-engine
 
 go 1.19
 
