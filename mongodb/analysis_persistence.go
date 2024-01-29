@@ -2,7 +2,7 @@ package mongodb
 
 import (
 	"context"
-	"github.com/jpandof/data-engine/entities"
+	"github.com/jpandof/data-engine/entities/mars"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -39,7 +39,7 @@ func (p *AnalysisPersistence) FetchAllIdWallet() ([]string, error) {
 	defer cursor.Close(ctx)
 
 	for cursor.Next(ctx) {
-		var wallet entities.Wallet
+		var wallet mars.Wallet
 		if err := cursor.Decode(&wallet); err != nil {
 			log.Fatal(err)
 		}
@@ -49,9 +49,9 @@ func (p *AnalysisPersistence) FetchAllIdWallet() ([]string, error) {
 	return walletIDs, nil
 }
 
-func (p *AnalysisPersistence) FetchWalletLevelDB(walletID *string) (*entities.Wallet, error) {
+func (p *AnalysisPersistence) FetchWallet(walletID *string) (*mars.Wallet, error) {
 	ctx := context.Background()
-	var wallet entities.Wallet
+	var wallet mars.Wallet
 
 	err := p.walletsCollection.FindOne(ctx, bson.M{"_id": walletID}).Decode(&wallet)
 	if err != nil {
@@ -61,7 +61,7 @@ func (p *AnalysisPersistence) FetchWalletLevelDB(walletID *string) (*entities.Wa
 	return &wallet, nil
 }
 
-func (p *AnalysisPersistence) UpdateAnalysis(wallet *entities.Wallet) error {
+func (p *AnalysisPersistence) UpdateAnalysis(wallet *mars.Wallet) error {
 	ctx := context.Background()
 
 	opts := options.Update().SetUpsert(true)

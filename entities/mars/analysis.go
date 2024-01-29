@@ -1,4 +1,4 @@
-package entities
+package mars
 
 import "time"
 
@@ -14,21 +14,6 @@ const (
 
 type Timestamp struct {
 	time.Time
-}
-
-type TransactionPriced struct {
-	Id            *string `json:"i" bson:"i"`
-	TypeOperation *string `json:"t" bson:"t"`
-	Date          *int64  `json:"d" bson:"d"`
-	Quantity      *int64  `json:"q" bson:"q"`
-	UnitPrice     *int64  `json:"u" bson:"u"`
-	IDWallet      *string `json:"id_wallet,omitempty" bson:"id_wallet,omitempty"`
-}
-
-type Wallet struct {
-	ID           string              `json:"_id" bson:"_id"`
-	Transactions []TransactionPriced `json:"Transactions" bson:"Transactions"`
-	Analysis     *Analysis           `json:"Analysis,omitempty" bson:"Analysis,omitempty"`
 }
 
 type Analysis struct {

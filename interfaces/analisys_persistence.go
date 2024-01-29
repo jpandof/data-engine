@@ -1,9 +1,11 @@
 package interfaces
 
-import "github.com/jpandof/data-engine/entities"
+import (
+	"github.com/jpandof/data-engine/entities/mars"
+)
 
 type AnalysisPersistence interface {
-	FetchAllIdWallet() ([]string, error) // GetAllWalletIDsLevelDB(id string) ([]string, error)
-	FetchWalletLevelDB(walletID *string) (*entities.Wallet, error)
-	UpdateAnalysis(wallet *entities.Wallet) error
+	FetchAllIdWallet() ([]string, error)
+	FetchWallet(walletID *string) (*mars.Wallet, error)
+	UpdateAnalysis(wallet *mars.Wallet) error
 }

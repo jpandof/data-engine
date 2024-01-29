@@ -2,7 +2,7 @@ package mongodb
 
 import (
 	"context"
-	"github.com/jpandof/data-engine/entities"
+	"github.com/jpandof/data-engine/entities/btc"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -36,11 +36,15 @@ func NewMongoBTCPersistence(uri, dbName string) (*BTCPersistence, error) {
 	}, nil
 }
 
-func (m *BTCPersistence) FetchTx(tx *entities.Tx) (*entities.Tx, error) {
+func (m *BTCPersistence) FetchTx(tx *btc.Tx) (*btc.Tx, error) {
 	filter := bson.M{"_id": tx.Id}
 	result := m.txCollection.FindOne(context.Background(), filter)
 
-	var fetchedTx entities.Tx
+	if result.Err() == mongo.ErrNoDocuments {
+		return nil, nil
+	}
+
+	var fetchedTx btc.Tx
 	err := result.Decode(&fetchedTx)
 	if err != nil {
 		return nil, err
@@ -49,10 +53,11 @@ func (m *BTCPersistence) FetchTx(tx *entities.Tx) (*entities.Tx, error) {
 	return &fetchedTx, nil
 }
 
-func (m *BTCPersistence) SaveTx(txs []*entities.Tx) error {
+func (m *BTCPersistence) SaveTx(txs []*btc.Tx) error {
 
 	// MongoDB permite operaciones de inserción en batch, lo que es más eficiente
 	// que insertar cada transacción individualmente
+	opts := options.BulkWrite().SetOrdered(false)
 	var models []mongo.WriteModel
 	for _, tx := range txs {
 		// Crear un modelo de upsert para cada transacción
@@ -66,7 +71,7 @@ func (m *BTCPersistence) SaveTx(txs []*entities.Tx) error {
 
 	// Realizar la operación de inserción en batch
 	if len(models) > 0 {
-		_, err := m.txCollection.BulkWrite(context.Background(), models)
+		_, err := m.txCollection.BulkWrite(context.Background(), models, opts)
 		if err != nil {
 			return err
 		}
@@ -75,17 +80,42 @@ func (m *BTCPersistence) SaveTx(txs []*entities.Tx) error {
 	return nil
 }
 
-func (m *BTCPersistence) SaveBlkfile(blkfile *entities.Blkfile) error {
-	_, err := m.blkfilesCollection.InsertOne(context.Background(), blkfile)
-	return err
+func (m *BTCPersistence) SaveBlkfile(blkfile *btc.Blkfile) error {
+
+	filter := bson.M{"_id": blkfile.GetId()}
+	update := bson.M{"$setOnInsert": *blkfile}
+
+	_, err := m.blkfilesCollection.UpdateOne(
+		context.Background(),
+		filter,
+		update,
+		options.Update().SetUpsert(true),
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (m *BTCPersistence) SaveBlock(block *entities.Block) error {
-	_, err := m.blockCollection.InsertOne(context.Background(), block)
-	return err
+func (m *BTCPersistence) SaveBlock(block *btc.Block) error {
+	filter := bson.M{"_id": block.GetId()}
+	update := bson.M{"$setOnInsert": *block}
+
+	_, err := m.blockCollection.UpdateOne(
+		context.Background(),
+		filter,
+		update,
+		options.Update().SetUpsert(true),
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (m *BTCPersistence) IsBlkProcessed(blkfile *entities.Blkfile) (*bool, error) {
+func (m *BTCPersistence) IsBlkProcessed(blkfile *btc.Blkfile) (*bool, error) {
 	filter := bson.M{"_id": blkfile.Id}
 	result := m.blkfilesCollection.FindOne(context.Background(), filter)
 
@@ -101,7 +131,7 @@ func (m *BTCPersistence) IsBlkProcessed(blkfile *entities.Blkfile) (*bool, error
 	return &trueVal, nil
 }
 
-func (m *BTCPersistence) IsBlockProcessed(block *entities.Block) (*bool, error) {
+func (m *BTCPersistence) IsBlockProcessed(block *btc.Block) (*bool, error) {
 
 	filter := bson.M{"_id": block.Id}
 	result := m.blockCollection.FindOne(context.Background(), filter)

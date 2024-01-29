@@ -1,12 +1,14 @@
 package interfaces
 
-import "github.com/jpandof/data-engine/entities"
+import (
+	"github.com/jpandof/data-engine/entities/btc"
+)
 
 type BTCPersistence interface {
-	FetchTx(tx *entities.Tx) (*entities.Tx, error) // FetchTxLevelDB(tx *entities.Tx) (*entities.Tx, error)
-	SaveTx(txs []*entities.Tx) error               // SaveTxLevelDB(mapTx map[string][]byte) error
-	SaveBlkfile(blkfile *entities.Blkfile) error
-	SaveBlock(block *entities.Block) error
-	IsBlkProcessed(blkfile *entities.Blkfile) (*bool, error)
-	IsBlockProcessed(block *entities.Block) (*bool, error)
+	FetchTx(tx *btc.Tx) (*btc.Tx, error)
+	SaveTx(txs []*btc.Tx) error
+	SaveBlkfile(blkfile *btc.Blkfile) error
+	SaveBlock(block *btc.Block) error
+	IsBlkProcessed(blkfile *btc.Blkfile) (*bool, error)
+	IsBlockProcessed(block *btc.Block) (*bool, error)
 }
